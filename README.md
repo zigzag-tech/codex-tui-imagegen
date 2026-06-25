@@ -1,12 +1,35 @@
 # codex-tui-imagegen
 
-**Generate raster images for free** by driving [Codex](https://github.com/openai/codex)'s
-**interactive TUI** inside a `tmux` pane to reach its built-in `image_gen` tool
-(OpenAI's image model) — the tool that headless `codex exec` **can't see**.
-**No `OPENAI_API_KEY`, no fal-ai, no paid image API.**
+**Reliably get images out of Codex and onto disk — using the Codex / ChatGPT
+subscription you already pay for.**
+
+If you have a Codex/ChatGPT plan, you can generate images through Codex's built-in
+`image_gen` tool (OpenAI's image model) at **no extra cost** — no
+`OPENAI_API_KEY`, no fal-ai, no separate paid image API. The catch is that
+**running Codex directly keeps failing to deliver those images to a file path:**
+
+- `codex exec` (headless) reports the `image_gen` tool is **unavailable in the
+  session** — even with `image_generation = true`
+  ([#21640](https://github.com/openai/codex/issues/21640),
+  [#19133](https://github.com/openai/codex/issues/19133)).
+- And in sessions where it does run, a recent regression means generated images
+  are **no longer saved to disk**, and the tool response **exposes no usable file
+  path** to copy, version, or reference
+  ([#28881](https://github.com/openai/codex/issues/28881),
+  [#28898](https://github.com/openai/codex/issues/28898)).
+
+`codex-tui-imagegen` works around all of that. It drives Codex's **interactive
+TUI** inside a `tmux` pane — the one place `image_gen` is reliably available —
+waits for the PNG to land in `~/.codex/generated_images/`, and **copies it to the
+path you name.** One command in, a real file on disk out, every time.
+
+And it **saves money**: you're squeezing the image generation out of the
+flat-rate plan you already pay for (薅羊毛), instead of paying a per-image API
+(gpt-image, fal-ai, etc.) again on top of it. At any real volume that's the
+difference between $0 marginal cost and a metered bill.
 
 Use it for slide illustrations, hero images, concept art, mockups, textures,
-sprites — anywhere you'd otherwise reach for a paid image endpoint.
+sprites — anywhere you need an actual image *file*, not an inline chat preview.
 
 It ships as an **agent skill** (`SKILL.md`) so coding agents like Claude Code,
 Codex, Cursor, and others can invoke it automatically, but the underlying
