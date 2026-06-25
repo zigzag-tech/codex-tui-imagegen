@@ -40,7 +40,9 @@ fi
 
 log(){ printf '%s\n' "$*" >&2; }
 
-newest_png(){ ls -t "$GENDIR"/*/exec-*.png 2>/dev/null | head -1; }
+# Codex writes generated images as either exec-*.png (older) or ig_*.png (newer
+# image_gen tool output). Match both, else gen() waits forever on a wrong glob.
+newest_png(){ ls -t "$GENDIR"/*/exec-*.png "$GENDIR"/*/ig_*.png 2>/dev/null | head -1; }
 
 session_live(){ tmux has-session -t "$SESSION" 2>/dev/null; }
 
@@ -85,9 +87,12 @@ cmd_gen(){
   submit "Use the image_gen tool to generate this image now. Do not write code, do not ask questions. Prompt: ${prompt}"
 
   log "waiting for a new image (timeout ${TIMEOUT}s)..."
+  # Poll every 2s (was 4s): halves both detection latency and the post-write
+  # stability wait, so a typical image returns ~4s sooner per call — adds up
+  # across a batch.
   local found="" stable=0 last_size=-1 elapsed=0
   while [ "$elapsed" -lt "$TIMEOUT" ]; do
-    sleep 4; elapsed=$((elapsed+4))
+    sleep 2; elapsed=$((elapsed+2))
     local cand; cand="$(newest_png)"
     if [ -n "$cand" ]; then
       local m; m="$(_mtime "$cand")"
@@ -120,7 +125,7 @@ cmd_gen(){
 
 cmd_status(){
   if session_live; then log "session '$SESSION': UP"; else log "session '$SESSION': down"; fi
-  log "latest generated images:"; ls -t "$GENDIR"/*/exec-*.png 2>/dev/null | head -5 >&2 || log "  (none)"
+  log "latest generated images:"; ls -t "$GENDIR"/*/exec-*.png "$GENDIR"/*/ig_*.png 2>/dev/null | head -5 >&2 || log "  (none)"
 }
 
 cmd_stop(){ tmux kill-session -t "$SESSION" 2>/dev/null && log "killed '$SESSION'" || log "no session '$SESSION'"; }

@@ -29,8 +29,10 @@ Other hard-won facts:
 - Long/multiline prompts get captured by the TUI as a single `[Pasted Content]`
   chunk that **does not auto-submit** — you must send an **extra Enter**. The
   script always does this.
-- Output lands at `~/.codex/generated_images/<session-uuid>/exec-*.png`. The
-  newest `exec-*.png` is your result; copy it to a named path yourself.
+- Output lands at `~/.codex/generated_images/<session-uuid>/`, named either
+  `exec-*.png` (older Codex) or `ig_*.png` (newer `image_gen` tool). The helper
+  matches **both** globs; if you copy by hand, glob both. (A stale `exec-*`-only
+  match is what made `gen` hang forever while the pane already showed "Generated".)
 - A batch of N images can take ~7–15 min; each single image ~30–120s of
   inference — but a flaky connection can add 1–2 min of stream reconnects
   *before* inference starts, so the per-image wait defaults to 360s. If a `gen`
