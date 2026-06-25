@@ -28,6 +28,16 @@ CWD="${CIG_CWD:-/tmp}"
 TIMEOUT="${CIG_TIMEOUT:-360}"
 GENDIR="$HOME/.codex/generated_images"
 
+# Portable stat: GNU coreutils (Linux) uses `-c`, BSD (macOS) uses `-f`.
+# Detect once so the script runs natively on both with no coreutils install.
+if stat -c %Y . >/dev/null 2>&1; then
+  _mtime(){ stat -c %Y "$1" 2>/dev/null || echo 0; }
+  _size(){  stat -c %s "$1" 2>/dev/null || echo 0; }
+else
+  _mtime(){ stat -f %m "$1" 2>/dev/null || echo 0; }
+  _size(){  stat -f %z "$1" 2>/dev/null || echo 0; }
+fi
+
 log(){ printf '%s\n' "$*" >&2; }
 
 newest_png(){ ls -t "$GENDIR"/*/exec-*.png 2>/dev/null | head -1; }
@@ -69,7 +79,7 @@ cmd_gen(){
 
   local before; before="$(newest_png)"
   local before_mtime=0
-  [ -n "$before" ] && before_mtime="$(stat -c %Y "$before" 2>/dev/null || echo 0)"
+  [ -n "$before" ] && before_mtime="$(_mtime "$before")"
 
   # Force the image_gen path explicitly so the model doesn't answer in prose.
   submit "Use the image_gen tool to generate this image now. Do not write code, do not ask questions. Prompt: ${prompt}"
@@ -80,10 +90,10 @@ cmd_gen(){
     sleep 4; elapsed=$((elapsed+4))
     local cand; cand="$(newest_png)"
     if [ -n "$cand" ]; then
-      local m; m="$(stat -c %Y "$cand" 2>/dev/null || echo 0)"
+      local m; m="$(_mtime "$cand")"
       if [ "$m" -gt "$before_mtime" ]; then
         # wait until the file size stops changing (write finished)
-        local sz; sz="$(stat -c %s "$cand" 2>/dev/null || echo 0)"
+        local sz; sz="$(_size "$cand")"
         if [ "$sz" = "$last_size" ] && [ "$sz" -gt 0 ]; then
           stable=$((stable+1))
           [ "$stable" -ge 2 ] && { found="$cand"; break; }

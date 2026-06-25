@@ -52,9 +52,9 @@ like, `stop` when done.
   (ChatGPT account or API key — the `image_gen` tool itself needs no extra key).
 - **`tmux`** installed and on `PATH` (`apt install tmux` / `brew install tmux`) —
   the whole approach hinges on keeping the Codex TUI alive in a tmux pane.
-- **GNU coreutils** — the script uses `stat -c`, so it targets **Linux**. On
-  macOS, install coreutils (`brew install coreutils`) and put GNU `stat` on
-  `PATH`, or run it on a Linux box / container.
+- **Linux or macOS.** Plain `bash` + `tmux`; the script auto-detects GNU (`stat
+  -c`) vs BSD (`stat -f`), so macOS works natively with no coreutils install.
+  Tested most on Linux — file an issue if you hit a macOS rough edge.
 - A **trusted** launch directory in `~/.codex/config.toml`
   (`trust_level = "trusted"`) so full-auto needs no approval prompt. `/tmp` and
   `~` are already trusted by default; the script launches in `/tmp` unless you
@@ -122,14 +122,14 @@ The same TUI session is reused, so `start` happens once:
 
 ```bash
 "$SKILL" start
-declare -A imgs=(
-  [ill-engine]="a stylized engine block labeled LLM, gold-on-black, flat vector"
-  [ill-context]="a window filling up with colored blocks, memory metaphor, gold-on-black"
-  [ill-verify]="a magnifying glass over a checklist, gentle humor, gold-on-black"
-)
-for name in "${!imgs[@]}"; do
-  "$SKILL" gen "${imgs[$name]}" "./assets/${name}.png"
-done
+# name<TAB>prompt pairs — portable, no bash-4 associative arrays needed
+while IFS=$'\t' read -r name prompt; do
+  "$SKILL" gen "$prompt" "./assets/${name}.png"
+done <<'BATCH'
+ill-engine	a stylized engine block labeled LLM, gold-on-black, flat vector
+ill-context	a window filling up with colored blocks, memory metaphor, gold-on-black
+ill-verify	a magnifying glass over a checklist, gentle humor, gold-on-black
+BATCH
 "$SKILL" stop
 ```
 
