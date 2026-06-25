@@ -55,6 +55,11 @@ like, `stop` when done.
 - **Linux or macOS.** Plain `bash` + `tmux`; the script auto-detects GNU (`stat
   -c`) vs BSD (`stat -f`), so macOS works natively with no coreutils install.
   Tested most on Linux — file an issue if you hit a macOS rough edge.
+- **Windows: use WSL.** Native Windows has no `tmux`, so run everything inside a
+  WSL (Linux) shell. Caveat: Codex itself has reported the `image_gen` tool as
+  *unavailable* in some Windows/WSL sessions even with `image_generation = true`
+  ([#19133](https://github.com/openai/codex/issues/19133)) — that's a Codex
+  platform limitation, not this wrapper, so WSL isn't guaranteed to work.
 - A **trusted** launch directory in `~/.codex/config.toml`
   (`trust_level = "trusted"`) so full-auto needs no approval prompt. `/tmp` and
   `~` are already trusted by default; the script launches in `/tmp` unless you
