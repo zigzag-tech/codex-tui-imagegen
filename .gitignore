@@ -1,0 +1,4 @@
+# generated output
+assets/*.png
+*.png
+.DS_Store
