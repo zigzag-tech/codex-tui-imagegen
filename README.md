@@ -1,8 +1,9 @@
-# codex-imagegen
+# codex-tui-imagegen
 
-**Generate raster images for free** using [Codex](https://github.com/openai/codex)'s
-built-in `image_gen` tool (OpenAI's image model) — driven through a real Codex TUI
-living in a `tmux` pane. **No `OPENAI_API_KEY`, no fal-ai, no paid image API.**
+**Generate raster images for free** by driving [Codex](https://github.com/openai/codex)'s
+**interactive TUI** inside a `tmux` pane to reach its built-in `image_gen` tool
+(OpenAI's image model) — the tool that headless `codex exec` **can't see**.
+**No `OPENAI_API_KEY`, no fal-ai, no paid image API.**
 
 Use it for slide illustrations, hero images, concept art, mockups, textures,
 sprites — anywhere you'd otherwise reach for a paid image endpoint.
