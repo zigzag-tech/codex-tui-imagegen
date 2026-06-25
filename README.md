@@ -50,7 +50,8 @@ like, `stop` when done.
 
 - **[Codex CLI](https://github.com/openai/codex)** installed and signed in
   (ChatGPT account or API key — the `image_gen` tool itself needs no extra key).
-- **`tmux`**.
+- **`tmux`** installed and on `PATH` (`apt install tmux` / `brew install tmux`) —
+  the whole approach hinges on keeping the Codex TUI alive in a tmux pane.
 - **GNU coreutils** — the script uses `stat -c`, so it targets **Linux**. On
   macOS, install coreutils (`brew install coreutils`) and put GNU `stat` on
   `PATH`, or run it on a Linux box / container.
